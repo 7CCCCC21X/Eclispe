@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>账户查询与交易次数</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    .token-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>账户查询与交易次数</h1>
+  <textarea id="addresses" rows="5" cols="50" placeholder="请输入账户地址，每个地址一行"></textarea><br><br>
+  <button onclick="fetchBatchData()">查询</button>
+
+  <div id="result"></div>
+
+  <script>
+    function fetchBatchData() {
+      const addresses = document.getElementById('addresses').value.trim().split("\n");
+      if (addresses.length === 0) {
+        alert("请输入账户地址！");
+        return;
+      }
+
+      // 清空显示区域
+      document.getElementById('result').innerHTML = "正在查询...";
+
+      let promises = addresses.map(address => {
+<<<<<<< HEAD
+        const apiUrl = '/api/query';
+=======
+        const apiUrl = '/api/query';  // 使用相对路径，无需硬编码域名
+>>>>>>> ecebaca75ae9817f36f2ba693c8a0f72e3e8cbf2
+
+        // 发送请求到后端
+        return fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ addresses: [address.trim()] })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            const accountInfo = data[0];
+            return {
+              account: accountInfo.account || "无",
+              domain: accountInfo.domain || "无",
+              firstDepositTime: accountInfo.firstDepositTime || "无",
+              lamports: accountInfo.lamports || "无",
+              tokens: accountInfo.tokens || [],
+              transactionCount: accountInfo.transactionCount || "无",
+              activeDuration: accountInfo.activeDuration || { days: 0, weeks: 0, months: 0 }
+            };
+          } else {
+            return { account: address.trim(), error: "查询失败，出现错误" };
+          }
+        })
+        .catch(error => {
+          console.error("查询错误:", error);
+          return { account: address.trim(), error: "查询失败，出现错误" };
+        });
+      });
+
+      // 等待所有请求完成
+      Promise.all(promises)
+        .then(results => {
+          let html = `
+            <table>
+              <thead>
+                <tr>
+                  <th>账户地址</th>
+                  <th>域名</th>
+                  <th>首次存款时间</th>
+                  <th>账户余额 (ETH)</th>
+                  <th>代币余额</th>
+                  <th>交易次数</th>
+                  <th>活跃天数</th>
+                  <th>活跃周数</th>
+                  <th>活跃月数</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+
+          results.forEach(result => {
+            html += `
+              <tr>
+                <td>${result.account}</td>
+                <td>${result.domain || result.error}</td>
+                <td>${result.firstDepositTime || result.error}</td>
+                <td>${result.lamports || result.error}</td>
+                <td>
+                  ${result.tokens.length > 0 ? result.tokens.map(token => `
+                    <div>
+                      <img class="token-icon" src="${token.tokenIcon}" alt="${token.tokenSymbol}">${token.tokenName} (${token.tokenSymbol}): ${token.balance} - $${token.value}
+                    </div>
+                  `).join('') : '无'}
+                </td>
+                <td>${result.transactionCount}</td>
+                <td>${result.activeDuration.days} 天</td>
+                <td>${result.activeDuration.weeks} 周</td>
+                <td>${result.activeDuration.months} 月</td>
+              </tr>
+            `;
+          });
+
+          html += `</tbody></table>`;
+          document.getElementById('result').innerHTML = html;
+        });
+    }
+  </script>
+</body>
+</html>
