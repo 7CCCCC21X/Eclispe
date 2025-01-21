@@ -53,11 +53,8 @@
       document.getElementById('result').innerHTML = "正在查询...";
 
       let promises = addresses.map(address => {
-<<<<<<< HEAD
-        const apiUrl = '/api/query';
-=======
-        const apiUrl = '/api/query';  // 使用相对路径，无需硬编码域名
->>>>>>> ecebaca75ae9817f36f2ba693c8a0f72e3e8cbf2
+        // 修改为部署后的 Vercel URL
+        const apiUrl = 'https://eclispe-kx8dehei0-7ccccc21xs-projects.vercel.app/api/query';
 
         // 发送请求到后端
         return fetch(apiUrl, {
